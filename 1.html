@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Incentive Club Med - Pointage des ventes</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 15px;
+            background-color: #f0f7ff;
+        }
+        
+        h1 { 
+            color: #002654;
+            font-size: 24px;
+            margin-bottom: 25px;
+        }
+
+        .form-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        select { 
+            flex: 1;
+            min-width: 200px;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        button {
+            padding: 12px 20px;
+            background-color: #002654;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        #addSale {
+            background-color: #4CAF50;
+        }
+
+        .saleEntry {
+            padding: 15px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: #f9f9f9;
+        }
+
+        .rankings-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .ranking-section {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        h3 {
+            color: #002654;
+            font-size: 16px;
+            margin: 0 0 15px 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 15px;
+        }
+
+        th {
+            background-color: #002654;
+            color: white;
+            padding: 12px 8px;
+            text-align: left;
+        }
+
+        td {
+            padding: 8px;
+            border: 1px solid #ddd;
+        }
+
+        .category-header {
+            background-color: #f5f5f5;
+            font-weight: bold;
+        }
+
+        @media (max-width: 768px) {
+            .rankings-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-group {
+                flex-direction: column;
+            }
+            
+            select {
+                width: 100%;
+            }
+            
+            .button-group {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Incentive Club Med - Pointage des ventes</h1>
+
+    <div class="form-container">
+        <form id="saleForm">
+            <div class="form-group">
+                <select id="agent" required>
+                    <option value="">Sélectionnez un agent</option>
+                </select>
+                <select id="boutique" required>
+                    <option value="">Sélectionnez une boutique</option>
+                </select>
+            </div>
+
+            <div id="salesInputs">
+                <div class="saleEntry">
+                    <div class="form-group">
+                        <select class="productType" required>
+                            <option value="">Type de produit</option>
+                            <option value="MOB L">MOB L</option>
+                            <option value="MOB L Pro">MOB L Pro</option>
+                            <option value="MOB M">MOB M</option>
+                            <option value="MOB M Pro">MOB M Pro</option>
+                            <option value="MOB S">MOB S</option>
+                            <option value="MOB S Pro">MOB S Pro</option>
+                            <option value="NET 1P Relax">NET 1P Relax</option>
+                            <option value="Pack RelaxNET">Pack RelaxNET</option>
+                            <option value="NET 1P Max">NET 1P Max</option>
+                            <option value="NET Max Pack">NET Max Pack</option>
+                            <option value="1P NET 1P Giga max Pro">1P NET 1P Giga max Pro</option>
+                            <option value="NET Giga max Pro">NET Giga max Pro</option>
+                        </select>
+                        <select class="clientType" required>
+                            <option value="">Type de client</option>
+                            <option value="OBE">Clients OBE</option>
+                            <option value="PXS">Clients Pxs/Autres</option>
+                            <option value="EXISTING">Client Existant+ Nouveau</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="button-group">
+                <button type="button" id="addSale">+ Ajouter une vente</button>
+                <button type="submit">Enregistrer les ventes</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="rankings-grid">
+        <div class="ranking-section">
+            <h3>Agents par volume</h3>
+            <table id="agentVolumeRanking">
+                <tr>
+                    <th>Rang</th>
+                    <th>Agent</th>
+                    <th>Catégorie</th>
+                    <th>Points</th>
+                </tr>
+            </table>
+        </div>
+
+        <div class="ranking-section">
+            <h3>Agents par dépassement d'objectif</h3>
+            <table id="agentObjectiveRanking">
+                <tr>
+                    <th>Rang</th>
+                    <th>Agent</th>
+                    <th>Catégorie</th>
+                    <th>% Objectif</th>
+                </tr>
+            </table>
+        </div>
+
+        <div class="ranking-section">
+            <h3>Boutiques par volume</h3>
+            <table id="boutiqueVolumeRanking">
+                <tr>
+                    <th>Rang</th>
+                    <th>Boutique</th>
+                    <th>Points</th>
+                </tr>
+            </table>
+        </div>
+
+        <div class="ranking-section">
+            <h3>Boutiques par dépassement d'objectif</h3>
+            <table id="boutiqueObjectiveRanking">
+                <tr>
+                    <th>Rang</th>
+                    <th>Boutique</th>
+                    <th>% Objectif</th>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        const agents = [
+    // Catégorie A
+    { id: 1, name: "CBADOT", category: "A", objective: 630.9 },
+    { id: 2, name: "CDEROO", category: "A", objective: 745.8 },
+    { id: 3, name: "DCELINE", category: "A", objective: 745.8 },
+    { id: 4, name: "DMUNIX", category: "A", objective: 745.8 },
+    { id: 5, name: "EJELAIEL", category: "A", objective: 745.8 },
+    { id: 6, name: "GCAGNINA", category: "A", objective: 745.8 },
+    { id: 7, name: "GMOUFFE", category: "A", objective: 745.8 },
+    { id: 8, name: "GFILIPPA", category: "A", objective: 745.8 },
+    { id: 9, name: "SBOURKHONOV", category: "A", objective: 745.8 },
+    { id: 10, name: "SCIRILLI", category: "A", objective: 745.8 },
+    { id: 11, name: "TEMBAREK", category: "A", objective: 745.8 },
+    { id: 12, name: "VMALOPERA", category: "A", objective: 745.8 },
+
+    // Catégorie B
+    { id: 13, name: "AVALLI", category: "B", objective: 731.3 },
+    { id: 14, name: "BCHAUSSIER", category: "B", objective: 731.3 },
+    { id: 15, name: "CSURQUIN", category: "B", objective: 731.3 },
+    { id: 16, name: "DDAINVILLE", category: "B", objective: 731.3 },
+    { id: 17, name: "FSILVA", category: "B", objective: 731.3 },
+    { id: 18, name: "GDENEFFE", category: "B", objective: 731.3 },
+    { id: 19, name: "ISULEYMAN", category: "B", objective: 731.3 },
+    { id: 20, name: "JVAEREMANS", category: "B", objective: 731.3 },
+    { id: 21, name: "LVARDARO", category: "B", objective: 626.2 },
+    { id: 22, name: "MBOISSEAUX", category: "B", objective: 731.3 },
+    { id: 23, name: "MCORNIL", category: "B", objective: 731.3 },
+    { id: 24, name: "MVANHORICK", category: "B", objective: 731.3 },
+    { id: 25, name: "SDEMIR", category: "B", objective: 731.3 },
+    { id: 26, name: "SDEMOULIN", category: "B", objective: 731.3 },
+    { id: 27, name: "VPAPADOPOULO", category: "B", objective: 731.3 },
+
+    // Catégorie C
+    { id: 28, name: "AELHENDI", category: "C", objective: 673.5 },
+    { id: 29, name: "BMINET", category: "C", objective: 673.5 },
+    { id: 30, name: "BSTOOB", category: "C", objective: 673.5 },
+    { id: 31, name: "DCULOT", category: "C", objective: 673.5 },
+    { id: 32, name: "KLEPERS", category: "C", objective: 673.5 },
+    { id: 33, name: "TBENAMGHAR", category: "C", objective: 673.5 },
+
+    // Catégorie D/E
+    { id: 34, name: "FLARUE", category: "D", objective: 566.6 },
+    { id: 35, name: "GLAMENDOLA", category: "D", objective: 566.6 },
+    { id: 36, name: "GNGABO", category: "D", objective: 664.8 },
+    { id: 37, name: "HDOSREIS", category: "D", objective: 664.8 },
+    { id: 38, name: "JHULO", category: "D", objective: 566.6 },
+    { id: 39, name: "JMALHERBE", category: "D", objective: 566.2 },
+    { id: 40, name: "MABUJAHUR", category: "D", objective: 566.6 },
+    { id: 41, name: "NAHIDAR", category: "D", objective: 664.8 },
+    { id: 42, name: "NFERRO", category: "D", objective: 664.8 },
+    { id: 43, name: "SNABIL", category: "D", objective: 664.8 },
+    { id: 44, name: "TTRAUSCHT", category: "D", objective: 566.6 },
+    { id: 45, name: "VPIETQUIN", category: "D", objective: 435.3 }
+];
+
+const boutiques = [
+    { id: 1, name: "CHATELINEAU", objective: 3006 },
+    { id: 2, name: "BOUTIQUE ROCOURT", objective: 2697 },
+    { id: 3, name: "BOUTIQUE VINAVE", objective: 2203 },
+    { id: 4, name: "RIVE GAUCHE", objective: 2697 },
+    { id: 5, name: "BOUTIQUE MONS", objective: 2203 },
+    { id: 6, name: "BOUTIQUE LA LOUVIERE", objective: 2203 },
+    { id: 7, name: "IXELLES", objective: 2048 },
+    { id: 8, name: "BOUTIQUE NAMUR", objective: 2203 },
+    { id: 9, name: "BOUTIQUE TOURNAI", objective: 2048 },
+    { id: 10, name: "BOUTIQUE VERVIERS", objective: 1535 },
+    { id: 11, name: "BOUTIQUE HUY", objective: 1535 },
+    { id: 12, name: "BOUTIQUE MESSANCY", objective: 1350 },
+    { id: 13, name: "VILLE2", objective: 2048 },
+    { id: 14, name: "WOLUWE", objective: 1041 },
+    { id: 15, name: "UCCLE", objective: 1041 },
+    { id: 16, name: "BOUTIQUE WATERLOO", objective: 1041 }
+];
+
+        const pointsSystem = {
+            "MOB L": { OBE: 0, PXS: 25, EXISTING: 7 },
+            "MOB L Pro": { OBE: 0, PXS: 35, EXISTING: 10 },
+            "MOB M": { OBE: 0, PXS: 14, EXISTING: 4 },
+            "MOB M Pro": { OBE: 0, PXS: 28, EXISTING: 8 },
+            "MOB S": { OBE: 0, PXS: 14, EXISTING: 4 },
+            "MOB S Pro": { OBE: 0, PXS: 21, EXISTING: 9 },
+            "NET 1P Relax": { OBE: 0, PXS: 16, EXISTING: 11 },
+            "Pack RelaxNET": { OBE: 0, PXS: 19, EXISTING: 12 },
+            "NET 1P Max": { OBE: 0, PXS: 21, EXISTING: 14 },
+            "NET Max Pack": { OBE: 0, PXS: 25, EXISTING: 8 },
+            "1P NET 1P Giga max Pro": { OBE: 0, PXS: 25, EXISTING: 8 },
+            "NET Giga max Pro": { OBE: 0, PXS: 32, EXISTING: 11 }
+        };
+
+        let sales = [];
+        let saleCount = 1;
+        const maxSales = 6;
+
+        function calculatePoints(productType, clientType) {
+            return pointsSystem[productType][clientType];
+        }
+
+        // Gestion des ventes multiples
+        document.getElementById('addSale').addEventListener('click', function() {
+            if (saleCount < maxSales) {
+                const salesInputs = document.getElementById('salesInputs');
+                const newSaleDiv = document.createElement('div');
+                newSaleDiv.className = 'saleEntry';
+                newSaleDiv.innerHTML = document.querySelector('.saleEntry').innerHTML;
+                salesInputs.appendChild(newSaleDiv);
+                saleCount++;
+            }
+            if (saleCount >= maxSales) {
+                this.disabled = true;
+            }
+        });
+
+        function updateRankings() {
+            const categories = ['A', 'B', 'C', 'D'];
+            
+            const agentTotals = agents.map(agent => {
+                const agentSales = sales.filter(sale => sale.agentId === agent.id);
+                const points = agentSales.reduce((sum, sale) => sum + sale.points, 0);
+                return { 
+                    ...agent, 
+                    points, 
+                    percentObjective: (points / agent.objective) * 100 
+                };
+            });
+
+            // Classement par catégorie et volume
+            let volumeRankingHtml = '';
+            categories.forEach(category => {
+                const categoryAgents = agentTotals
+                    .filter(agent => agent.category === category)
+                    .sort((a, b) => b.points - a.points);
+
+                if (categoryAgents.length > 0) {
+                    volumeRankingHtml += `
+                        <tr class="category-header">
+                            <td colspan="4">Catégorie ${category}</td>
+                        </tr>
+                        ${categoryAgents.map((agent, index) => 
+                            `<tr>
+                                <td>${index + 1}</td>
+                                <td>${agent.name}</td>
+                                <td>${agent.category}</td>
+                                <td>${agent.points}</td>
+                            </tr>`
+                        ).join('')}
+                    `;
+                }
+            });
+
+            document.getElementById('agentVolumeRanking').innerHTML = `
+                <tr>
+                    <th>Rang</th>
+                    <th>Agent</th>
+                    <th>Catégorie</th>
+                    <th>Points</th>
+                </tr>
+                ${volumeRankingHtml}
+            `;
+
+            // Mise à jour des autres classements
+            const boutiqueTotals = boutiques.map(boutique => {
+                const boutiqueSales = sales.filter(sale => sale.boutiqueId === boutique.id);
+                const points = boutiqueSales.reduce((sum, sale) => sum + sale.points, 0);
+                return { 
+                    ...boutique, 
+                    points, 
+                    percentObjective: (points / boutique.objective) * 100 
+                };
+            });
+
+            displayRanking('agentObjectiveRanking', agentTotals.sort((a, b) => b.percentObjective - a.percentObjective),
+                           (agent, index) => `<tr><td>${index + 1}</td><td>${agent.name}</td><td>${agent.category}</td><td>${agent.percentObjective.toFixed(2)}%</td></tr>`);
+
+            displayRanking('boutiqueVolumeRanking', boutiqueTotals.sort((a, b) => b.points - a.points),
+                           (boutique, index) => `<tr><td>${index + 1}</td><td>${boutique.name}</td><td>${boutique.points}</td></tr>`);
+
+            displayRanking('boutiqueObjectiveRanking', boutiqueTotals.sort((a, b) => b.percentObjective - a.percentObjective),
+                           (boutique, index) => `<tr><td>${index + 1}</td><td>${boutique.name}</td><td>${boutique.percentObjective.toFixed(2)}%</td></tr>`);
+        }
+
+        function displayRanking(tableId, data, rowFormatter) {
+            const table = document.getElementById(tableId);
+            const headerRow = table.rows[0].outerHTML;
+            const rows = data.map((item, index) => rowFormatter(item, index)).join('');
+            table.innerHTML = headerRow + rows;
+        }
+
+        // Initialisation des listes déroulantes
+        agents.forEach(agent => {
+            const option = document.createElement('option');
+            option.value = agent.id;
+            option.textContent = agent.name;
+            document.getElementById('agent').appendChild(option);
+        });
+
+        boutiques.forEach(boutique => {
+            const option = document.createElement('option');
+            option.value = boutique.id;
+            option.textContent = boutique.name;
+            document.getElementById('boutique').appendChild(option);
+        });
+
+        // Gestion du formulaire
+        document.getElementById('saleForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const agentId = parseInt(document.getElementById('agent').value);
+            const boutiqueId = parseInt(document.getElementById('boutique').value);
+            
+            const saleEntries = document.getElementsByClassName('saleEntry');
+            for(let entry of saleEntries) {
+                const productType = entry.querySelector('.productType').value;
+                const clientType = entry.querySelector('.clientType').value;
+                
+                if(productType && clientType) {
+                    const points = calculatePoints(productType, clientType);
+                    sales.push({
+                        agentId,
+                        boutiqueId,
+                        productType,
+                        clientType,
+                        points,
+                        date: new Date()
+                    });
+                }
+            }
+
+            updateRankings();
+            
+            // Réinitialisation du formulaire
+            while(document.getElementsByClassName('saleEntry').length > 1) {
+                document.getElementsByClassName('saleEntry')[1].remove();
+            }
+            saleCount = 1;
+            document.getElementById('addSale').disabled = false;
+            this.reset();
+        });
+
+        // Initialisation des classements
+        updateRankings();
+    </script>
+</body>
+</html>
